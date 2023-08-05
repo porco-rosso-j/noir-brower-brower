@@ -46,23 +46,15 @@ export class NoirBrowser {
     this.acirComposer = await this.api.acirNewAcirComposer(subgroupSize);
   }
 
-      //console.log("input.x: ", input.x)
-    // add return witness
-    // initialWitness.set(total + 1, ethers.utils.hexZeroPad(`0x${Number(1).toString(16)}`, 32));
-
   async generateWitness(input: any): Promise<Uint8Array, any> {
     let initialWitness = new Map<number, string>();
+    
     let publicInput: any = [];
-
-    // const length = input.x.length + input.y.length + input.s.length + input.m.length;
 
     let total: number = 0;
     let i = 0;
-    
 
     for (i; i < 4; i++) {
-      // console.log("i: ", i)
-      // inputs = i == 0 ? input.x : (1 ? input.y : (2 ? input.s : (3 ? input.m : null)));
       let inputs;
       if ( i == 0 ) { inputs = input.x} 
       else if ( i == 1 ) { inputs = input.y } 
@@ -87,17 +79,19 @@ export class NoirBrowser {
         }
       }
 
-      console.log("publicInput: ", publicInput)
-
     }
 
     console.log("initialWitness final: ", initialWitness)
+    console.log("publicInput : ", publicInput)
 
     const witnessMap = await executeCircuit(this.acirBuffer, initialWitness, () => {
       throw Error('unexpected oracle');
     });
 
+    console.log("witnessMap : ", witnessMap)
+
     const witnessBuff = compressWitness(witnessMap);
+    console.log("witnessBuff : ", witnessBuff)
     return [witnessBuff, publicInput];
   }
 
