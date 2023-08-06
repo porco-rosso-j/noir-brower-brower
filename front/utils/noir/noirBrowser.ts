@@ -12,6 +12,12 @@ import { ethers } from 'ethers'; // I'm lazy so I'm using ethers to pad my input
 import circuit from '../../../circuits/target/main.json';
 import { Ptr } from '@aztec/bb.js/dest/node/types';
 
+// H4sIAAAAAAAA/7XW
+
+type genWitRet = {
+   witness: Uint8Array,
+   pubInput: any,
+}
 export class NoirBrowser {
   acir: string = '';
   acirBuffer: Uint8Array = Uint8Array.from([]);
@@ -29,7 +35,7 @@ export class NoirBrowser {
     this.acirBuffer = Buffer.from(circuit.bytecode, 'base64');
     this.acirBufferUncompressed = decompressSync(this.acirBuffer);
 
-    this.api = await newBarretenbergApiAsync(4);
+    this.api = await newBarretenbergApiAsync(100);
 
     const [exact, total, subgroup] = await this.api.acirGetCircuitSizes(
       this.acirBufferUncompressed,
@@ -46,7 +52,8 @@ export class NoirBrowser {
     this.acirComposer = await this.api.acirNewAcirComposer(subgroupSize);
   }
 
-  async generateWitness(input: any): Promise<Uint8Array, any> {
+
+  async generateWitness(input: any): Promise<genWitRet> {
     let initialWitness = new Map<number, string>();
     
     let publicInput: any = [];
@@ -61,7 +68,7 @@ export class NoirBrowser {
       else if ( i == 2 ) { inputs = input.s } 
       else { inputs = input.m }
 
-      console.log("inputs: ", inputs)
+      // console.log("inputs: ", inputs)
       // console.log("inputs.length: ", inputs.length)
 
       for (let j = 1; j < inputs.length; j++) {
@@ -81,18 +88,23 @@ export class NoirBrowser {
 
     }
 
-    console.log("initialWitness final: ", initialWitness)
-    console.log("publicInput : ", publicInput)
+    // console.log("initialWitness final: ", initialWitness)
+    // console.log("publicInput : ", publicInput)
 
     const witnessMap = await executeCircuit(this.acirBuffer, initialWitness, () => {
       throw Error('unexpected oracle');
     });
 
-    console.log("witnessMap : ", witnessMap)
+    // console.log("witnessMap : ", witnessMap)
 
     const witnessBuff = compressWitness(witnessMap);
-    console.log("witnessBuff : ", witnessBuff)
-    return [witnessBuff, publicInput];
+    // console.log("witnessBuff : ", witnessBuff)
+
+    const pubInput: genWitRet = {
+      witness: witnessBuff,
+      pubInput: publicInput
+    }
+    return pubInput;
   }
 
   async generateProof(witness: Uint8Array) {
@@ -105,8 +117,12 @@ export class NoirBrowser {
     return proof;
   }
 
+  async getVerifier():Promise<string> {
+    const verifier = await this.api.acirGetSolidityVerifier(this.acirComposer)
+    return verifier
+  }
+
   async verifyProof(proof: Uint8Array) {
-    await this.api.acirInitProvingKey(this.acirComposer, this.acirBufferUncompressed);
     const verified = await this.api.acirVerifyProof(this.acirComposer, proof, false);
     console.log("verified: ", verified)
     return verified;
