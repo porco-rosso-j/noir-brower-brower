@@ -45,48 +45,16 @@ export class NoirNode {
     this.acirComposer = await this.api.acirNewAcirComposer(subgroupSize);
   }
 
-    // initialWitness.set(1, ethers.utils.hexZeroPad(`0x${input.x.toString(16)}`, 32));
-    // initialWitness.set(2, ethers.utils.hexZeroPad(`0x${input.y.toString(16)}`, 32));
-    // const length = input.x.length + input.y.length + input.s.length + input.m.length;
-
-  async generateWitness(input: any, acirBuffer: Buffer): Promise<Uint8Array> {
-    let initialWitness= new Map<number, string>();
-
-    let i = 1;
-    for (i; i <= input.x.length; i++) {
-      //console.log("valeu: ", value)
-      initialWitness.set(i, ethers.utils.hexZeroPad(`0x${input.x[i].toString(16)}`, 32));
-      console.log("initialWitness: ", initialWitness)
-    }
-
-    // let j = i + 1;
-    // for (j; j <= input.y.length + i; j++) {
-    //   initialWitness.set(i, ethers.utils.hexZeroPad(`0x${input.y[j].toString(16)}`, 32));
-    //   console.log("initialWitness: ", initialWitness)
-    // }
-
-    // let k = j + 1;
-    // for (k; k <= input.s.length + j; k++) {
-    //   initialWitness.set(k, ethers.utils.hexZeroPad(`0x${input.s[k].toString(16)}`, 32));
-    //   console.log("initialWitness: ", initialWitness)
-    // }
-  
-    // let l = k + 1;
-    // for (l; l <= input.m.length + k; l++) {
-    //   initialWitness.set(l, ethers.utils.hexZeroPad(`0x${input.m[l].toString(16)}`, 32));
-    //   console.log("initialWitness: ", initialWitness)
-    // }
-
-    console.log("initialWitness final: ", initialWitness)
+  async generateWitness(input: any): Promise<Uint8Array> {
+    const initialWitness = new Map<number, string>();
+    initialWitness.set(1, ethers.utils.hexZeroPad(`0x${input.x.toString(16)}`, 32));
+    initialWitness.set(2, ethers.utils.hexZeroPad(`0x${input.y.toString(16)}`, 32));
 
     const witnessMap = await executeCircuit(this.acirBuffer, initialWitness, () => {
       throw Error('unexpected oracle');
     });
 
-    console.log("witnessMap: ", witnessMap)
-
     const witnessBuff = compressWitness(witnessMap);
-    console.log("witnessBuff: ", witnessBuff)
     return witnessBuff;
   }
 

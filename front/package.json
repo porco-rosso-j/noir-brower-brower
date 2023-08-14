@@ -7,12 +7,13 @@
         "test": "hardhat compile && vitest"
     },
     "dependencies": {
-        "@aztec/bb.js": "^0.3.4",
-        "@noir-lang/acvm_js": "git+https://github.com/noir-lang/acvm-simulator-wasm.git#c56eec56f67f90fef90126c5575b85190bdcd1e1",
+        "@aztec/bb.js": "^0.3.6",
+        "@noir-lang/acvm_js": "git+https://github.com/noir-lang/acvm-simulator-wasm.git",
         "axios": "^1.3.4",
         "dotenv": "^16.0.3",
         "ethers": "^5.7.2",
         "fflate": "^0.8.0",
+        "fs": "^0.0.1-security",
         "next": "latest",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",

@@ -9,7 +9,7 @@ import {
 } from '@aztec/bb.js/dest/browser/index.js';
 import initACVM, { executeCircuit, compressWitness } from '@noir-lang/acvm_js';
 import { ethers } from 'ethers'; // I'm lazy so I'm using ethers to pad my input
-import circuit from '../../../circuits/target/main.json';
+import circuit from '../../../circuits/target/p256.json';
 import { Ptr } from '@aztec/bb.js/dest/node/types';
 
 // H4sIAAAAAAAA/7XW
@@ -35,7 +35,7 @@ export class NoirBrowser {
     this.acirBuffer = Buffer.from(circuit.bytecode, 'base64');
     this.acirBufferUncompressed = decompressSync(this.acirBuffer);
 
-    this.api = await newBarretenbergApiAsync(100);
+    this.api = await newBarretenbergApiAsync(4);
 
     const [exact, total, subgroup] = await this.api.acirGetCircuitSizes(
       this.acirBufferUncompressed,

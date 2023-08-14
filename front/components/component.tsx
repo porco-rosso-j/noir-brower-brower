@@ -7,6 +7,7 @@ import { NoirBrowser } from '../utils/noir/noirBrowser';
 
 import { ThreeDots } from 'react-loader-spinner';
 import * as utils from "../utils/webauthn/utils"
+import {proofRaw, proofRaw2} from "../utils/proof"
 
 function Component() {
   const [input, setInput] = useState({ x: '', y: '', s: '', m: ''});
@@ -35,7 +36,7 @@ function Component() {
       }
 
       const witnessAndPubinput = await noir.generateWitness(inputs);
-
+    
       setpublicInput(witnessAndPubinput.pubInput)
       const proof = await noir.generateProof(witnessAndPubinput.witness);
       console.log("proof: ", proof)
@@ -59,9 +60,13 @@ function Component() {
         
         const ethers = new Ethers();
 
+        //await getProof()
+        const localProofRaw = Buffer.from(proofRaw2)
         // await getPublicInputs(proof)
+        console.log("proof", localProofRaw)
+        console.log("publicInput: ", publicInput)
 
-        const ver = await ethers.contract.verify(proof.slice(2048), publicInput);
+         const ver = await ethers.contract.verify(localProofRaw, publicInput);
         if (ver) {
           toast.success('Proof verified on-chain!');
           setVerification(true);
