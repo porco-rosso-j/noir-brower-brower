@@ -61,12 +61,12 @@ function Component() {
         const ethers = new Ethers();
 
         //await getProof()
-        const localProofRaw = Buffer.from(proofRaw2)
-        // await getPublicInputs(proof)
-        console.log("proof", localProofRaw)
+        // const localProofRaw = Buffer.from(proofRaw2)
+        // // await getPublicInputs(proof)
+        console.log("proof", proof.slice(2048))
         console.log("publicInput: ", publicInput)
 
-         const ver = await ethers.contract.verify(localProofRaw, publicInput);
+         const ver = await ethers.contract.verify(proof.slice(2048), publicInput);
         if (ver) {
           toast.success('Proof verified on-chain!');
           setVerification(true);
